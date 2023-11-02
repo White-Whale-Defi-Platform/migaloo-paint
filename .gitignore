@@ -1,0 +1,5 @@
+/smart-contracts/target
+/smart-contracts/artifacts
+/smart-contracts/.DS_Store
+Cargo.lock
+

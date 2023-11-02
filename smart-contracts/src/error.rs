@@ -1,0 +1,30 @@
+use cosmwasm_std::{StdError, OverflowError};
+use thiserror::Error;
+
+#[derive(Error, Debug, PartialEq)]
+pub enum ContractError {
+    #[error("{0}")]
+    Std(#[from] StdError),
+
+    #[error("{0}")]
+    Ovf(#[from] OverflowError),
+    
+    #[error("Unauthorized")]
+    Unauthorized {},
+
+    #[error("Not Found")]
+    NotFound {},
+
+    #[error("No Funds")]
+    NoFunds {},
+
+    #[error("Invalid Funds Denom")]
+    InvalidFundsDenom {},
+
+    #[error("Invalid Funds Amount")]
+    InvalidFundsAmount {},
+
+    #[error("Invalid Color Format")]
+    InvalidColorFormat {},
+}
+

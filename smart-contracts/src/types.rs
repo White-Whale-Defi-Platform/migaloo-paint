@@ -2,32 +2,33 @@ use cosmwasm_schema::cw_serde;
 use cosmwasm_std::{Addr, Coin, Uint128};
 use cw_storage_plus::Map;
 
-pub type Size = u8;
-pub type Denom = String;
-pub type Color = String;
-pub type Amount = Uint128;
-pub type Point = (Size, Size);
-pub type Canvas<'a> = Map<'a, Point, CanvasField>;
+pub type Canvas<'a> = Map<'a, u128, CanvasField>;
 pub type Leaderboard<'a> = Map<'a, Addr, LeaderboardEntry>;
 
 #[cw_serde]
+pub struct Stats {
+    pub strokes: Uint128,
+    pub deposits: Uint128,
+}
+
+#[cw_serde]
 pub struct CanvasField {
-    pub amount: Amount,
-    pub color: Color,
+    pub painter: Addr,
+    pub color: String,
+    pub deposit: Uint128,
 }
 
 #[cw_serde]
 pub struct LeaderboardEntry {
-    pub account: Addr,
-    pub pixels: Amount,
-    pub amount: Amount,
+    pub painter: Addr,
+    pub strokes: Uint128,
+    pub deposits: Uint128,
 }
 
 #[cw_serde]
 pub struct Config {
-    pub owner: Addr,
+    pub size: Uint128,
+    pub color: String,
+    pub coin: Coin,
     pub furnace: Addr,
-    pub canvas_color: Color,
-    pub canvas_size: Size,
-    pub canvas_coin: Coin,
 }

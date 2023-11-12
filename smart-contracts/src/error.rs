@@ -1,4 +1,4 @@
-use cosmwasm_std::{StdError, OverflowError};
+use cosmwasm_std::{OverflowError, StdError};
 use thiserror::Error;
 
 #[derive(Error, Debug, PartialEq)]
@@ -8,9 +8,6 @@ pub enum ContractError {
 
     #[error("{0}")]
     Ovf(#[from] OverflowError),
-    
-    #[error("Unauthorized")]
-    Unauthorized {},
 
     #[error("Not Found")]
     NotFound {},
@@ -26,5 +23,7 @@ pub enum ContractError {
 
     #[error("Invalid Color Format")]
     InvalidColorFormat {},
-}
 
+    #[error("Invalid Position")]
+    InvalidPosition {},
+}

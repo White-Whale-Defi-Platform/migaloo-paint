@@ -1,28 +1,19 @@
 use cosmwasm_schema::{cw_serde, QueryResponses};
 use cosmwasm_std::{Addr, Coin, Uint128};
 
-use crate::types::{CanvasField, Color, Config, LeaderboardEntry, Size};
+use crate::types::{CanvasField, Config, LeaderboardEntry, Stats};
 
 #[cw_serde]
 pub struct InstantiateMsg {
-    pub owner: Addr,
     pub furnace: Addr,
-    pub canvas_size: Size,
-    pub canvas_color: Color,
-    pub canvas_coin: Coin,
+    pub size: Uint128,
+    pub color: String,
+    pub coin: Coin,
 }
 
 #[cw_serde]
 pub enum ExecuteMsg {
-    UpdateConfig {
-        owner: Option<Addr>,
-        furnace: Option<Addr>,
-    },
-    Paint {
-        x: Size,
-        y: Size,
-        color: Color,
-    },
+    Paint { position: Uint128, color: String },
 }
 
 #[cw_serde]
@@ -30,12 +21,17 @@ pub enum ExecuteMsg {
 pub enum QueryMsg {
     #[returns(ConfigResponse)]
     Config {},
+    #[returns(StatsResponse)]
+    Stats {},
     #[returns(CanvasResponse)]
-    Canvas { start_row: Size, end_row: Size },
+    Canvas {
+        start_after: Option<Uint128>,
+        limit: Option<Uint128>,
+    },
     #[returns(LeaderboardResponse)]
     Leaderboard {
         start_after: Option<Addr>,
-        limit: Uint128,
+        limit: Option<Uint128>,
     },
 }
 
@@ -44,7 +40,12 @@ pub struct MigrateMsg {}
 
 #[cw_serde]
 pub struct CanvasResponse {
-    pub canvas: Vec<Vec<CanvasField>>,
+    pub canvas: Vec<CanvasField>,
+}
+
+#[cw_serde]
+pub struct StatsResponse {
+    pub stats: Stats,
 }
 
 #[cw_serde]

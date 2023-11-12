@@ -1,12 +1,13 @@
 use cosmwasm_std::{
     entry_point, to_json_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdError,
-    StdResult,
+    StdResult, Uint128,
 };
 
 use crate::error::ContractError;
 use crate::msg::{ExecuteMsg, InstantiateMsg, MigrateMsg, QueryMsg};
-use crate::state::CONFIG;
-use crate::types::Config;
+use crate::state::{CONFIG, STATS};
+use crate::types::{Config, Stats};
+use crate::util::validate_color;
 use crate::{execute, query};
 
 #[entry_point]
@@ -15,18 +16,26 @@ pub fn instantiate(
     _env: Env,
     _info: MessageInfo,
     msg: InstantiateMsg,
-) -> StdResult<Response> {
+) -> Result<Response, ContractError> {
+    // Initialize CONFIG
     CONFIG.save(
         deps.storage,
         &Config {
-            owner: deps.api.addr_validate(msg.owner.as_str())?,
+            size: msg.size,
+            color: validate_color(&msg.color)?,
+            coin: msg.coin,
             furnace: deps.api.addr_validate(msg.furnace.as_str())?,
-            canvas_coin: msg.canvas_coin,
-            canvas_color: msg.canvas_color,
-            canvas_size: msg.canvas_size,
         },
     )?;
-
+    // Initialize STATS
+    STATS.save(
+        deps.storage,
+        &Stats {
+            strokes: Uint128::new(0),
+            deposits: Uint128::new(0),
+        },
+    )?;
+    // Return
     Ok(Response::default())
 }
 
@@ -38,21 +47,21 @@ pub fn execute(
     msg: ExecuteMsg,
 ) -> Result<Response, ContractError> {
     match msg {
-        ExecuteMsg::Paint { x, y, color } => execute::paint(deps, env, info, x, y, color),
-        ExecuteMsg::UpdateConfig { owner, furnace } => execute::update_config(deps, env, info, owner, furnace),
+        ExecuteMsg::Paint { position, color } => execute::paint(deps, env, info, position, color),
     }
 }
 
 #[entry_point]
-pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
+pub fn query(deps: Deps, env: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
-        QueryMsg::Canvas { start_row, end_row } => {
-            to_json_binary(&query::query_canvas(deps, start_row, end_row)?)
+        QueryMsg::Canvas { start_after, limit } => {
+            to_json_binary(&query::query_canvas(deps, env, start_after, limit)?)
         }
 
         QueryMsg::Leaderboard { start_after, limit } => {
             to_json_binary(&query::query_leaderboard(deps, start_after, limit)?)
         }
+        QueryMsg::Stats {} => to_json_binary(&query::query_stats(deps)?),
         QueryMsg::Config {} => to_json_binary(&query::query_config(deps)?),
     }
 }

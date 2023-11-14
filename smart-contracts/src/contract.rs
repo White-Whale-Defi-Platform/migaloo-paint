@@ -27,6 +27,7 @@ pub fn instantiate(
             furnace: deps.api.addr_validate(msg.furnace.as_str())?,
         },
     )?;
+
     // Initialize STATS
     STATS.save(
         deps.storage,
@@ -35,6 +36,7 @@ pub fn instantiate(
             deposits: Uint128::new(0),
         },
     )?;
+
     // Return
     Ok(Response::default())
 }

@@ -1,4 +1,5 @@
 use cosmwasm_std::{OverflowError, StdError};
+use cw_utils::PaymentError;
 use thiserror::Error;
 
 #[derive(Error, Debug, PartialEq)]
@@ -8,6 +9,9 @@ pub enum ContractError {
 
     #[error("{0}")]
     Ovf(#[from] OverflowError),
+
+    #[error("{0}")]
+    Pe(#[from] PaymentError),
 
     #[error("Not Found")]
     NotFound {},

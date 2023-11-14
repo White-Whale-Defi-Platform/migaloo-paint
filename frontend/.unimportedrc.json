@@ -1,0 +1,28 @@
+{
+  "ignorePatterns": [
+    "**/node_modules/**",
+    "**/*.tests.{js,jsx,ts,tsx}",
+    "**/*.test.{js,jsx,ts,tsx}",
+    "**/*.spec.{js,jsx,ts,tsx}",
+    "**/tests/**",
+    "**/__tests__/**",
+    "**/*.d.ts"
+  ],
+  "ignoreUnimported": [],
+  "ignoreUnused": [
+    "next",
+    "react",
+    "react-dom",
+    "unimported",
+    "@cosmos-kit/keplr",
+    "@cosmos-kit/station",
+    "@cosmos-kit/leap"
+  ],
+  "ignoreUnresolved": [],
+  "entry": [
+    "src/app/layout.tsx",
+    "src/app/page.tsx",
+    "src/app/canvas/page.tsx",
+    "src/app/leaderboard/page.tsx"
+  ]
+}

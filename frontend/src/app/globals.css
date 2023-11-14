@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+@layer base {
+  html {
+    @apply h-full w-full;
+  }
+  body {
+    background: radial-gradient(circle at center, #052e16, #09090b);
+  }
+  h1,
+  h3,
+  a,
+  h4,
+  h5,
+  h6,
+  p,
+  th,
+  td,
+  label {
+    @apply text-neutral-300;
+  }
+
+  hr {
+    @apply border-0 h-px mx-4 mt-1 mb-2 bg-neutral-600;
+  }
+
+  h2 {
+    @apply text-neutral-300 text-xl font-medium;
+  }
+}

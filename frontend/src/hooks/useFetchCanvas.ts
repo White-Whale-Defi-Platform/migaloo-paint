@@ -1,59 +1,53 @@
-import { useState, useEffect, useMemo } from 'react';
-import { useRecoilValue } from 'recoil';
-import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
-import { fetchCanvas, FetchCanvasResponse } from '@/lib';
-import { configAtom } from '@/state';
-import { Tile } from '@/types/Canvas';
+import { useState, useEffect, useMemo } from 'react'
+import { fetchCanvas, fetchCanvasPayload } from '@/lib'
+import type { Canvas, Tile } from '@/state'
+import type { Async } from '@/types'
+import { CANVAS_FETCH_LIMIT, FETCH_INTERVAL, MIGALOO_PAINT_CONTRACT_ADDRESS } from '@/constants'
+import { useCosmWasmClient } from './useCosmWasmClient'
 
-const useFetchCanvas = (client: CosmWasmClient | null, contract: string) => {
-  const [canvas, setCanvasData] = useState<FetchCanvasResponse>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<unknown>(null);
-  const config = useRecoilValue(configAtom);
-  const limit = 20000;
+export interface useFetchCanvasResult extends Async {
+  canvas: Canvas | null
+}
 
-  const fetchAllCanvasData = async () => {
-    try {
-      if (!client || !config) return;
-      setLoading(true);
-
-      let startAfter = 0;
-      let allCanvasData: Tile[] = [];
-      let allTilesFetched = false;
-
-      while (!allTilesFetched) {
-        const response = await fetchCanvas(client, contract, startAfter.toString(), limit.toString());
-        if (!response || !response.canvas) {
-          throw new Error('Invalid response for canvas data');
-        }
-
-        allCanvasData = [...allCanvasData, ...response.canvas];
-
-        if (response.canvas.length < limit || startAfter + limit >= Number(config.config.canvas.size)) {
-          allTilesFetched = true;
-        } else {
-          startAfter += limit;
-        }
-      }
-      if (allCanvasData.length == Number(config.config?.canvas.size)) {
-        setCanvasData({ canvas: allCanvasData });
-      }
-    } catch (e) {
-      setError(e);
-    } finally {
-      setLoading(false);
-    }
-  };
+export const useFetchCanvas = (): useFetchCanvasResult => {
+  const { client } = useCosmWasmClient()
+  const [result, setResult] = useState<useFetchCanvasResult>({ canvas: null, loading: false, error: null })
 
   useEffect(() => {
-    fetchAllCanvasData();
+    const fetchAndSet = (): void => {
+      if (client === null) return
+      setResult(prev => ({ ...prev, loading: true }))
 
-    const interval = setInterval(fetchAllCanvasData, 20000);
+      const fetchAllCanvasData = async (): Promise<Canvas> => {
+        let startAfter = 0
+        let allCanvasData: Tile[] = []
+        let allTilesFetched = false
 
-    return () => clearInterval(interval);
-  }, [client, contract, config]);
+        while (!allTilesFetched) {
+          const response = await fetchCanvas(client, MIGALOO_PAINT_CONTRACT_ADDRESS, fetchCanvasPayload(startAfter, CANVAS_FETCH_LIMIT))
+          allCanvasData = [...allCanvasData, ...response.canvas.map(({ painter, color, deposit }) => ({ painter, color, deposit: Number(deposit) }))]
 
-  return useMemo(() => ({ canvas: canvas?.canvas, loading, error }), [canvas, loading, error]);
-};
+          if (response.canvas.length < CANVAS_FETCH_LIMIT) {
+            allTilesFetched = true
+          } else {
+            startAfter += CANVAS_FETCH_LIMIT
+          }
+        }
+        return { tiles: allCanvasData }
+      }
 
-export default useFetchCanvas;
+      fetchAllCanvasData()
+        .then(canvasData => setResult(prev => ({ ...prev, canvas: canvasData, error: null })))
+        .catch(error => setResult(prev => ({ ...prev, error: error as Error })))
+        .finally(() => setResult(prev => ({ ...prev, loading: false })))
+    }
+
+    fetchAndSet()
+    const interval = setInterval(fetchAndSet, FETCH_INTERVAL)
+    return () => clearInterval(interval)
+  },
+  [client]
+  )
+
+  return useMemo(() => result, [result])
+}

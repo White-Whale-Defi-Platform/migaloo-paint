@@ -1,9 +1,9 @@
 'use client'
-import { FC, ReactNode } from "react"
-import Navigation from "./navigation/Navigation"
-import Footer from "./footer/Footer"
-import Provider from "./provider/Provider"
-import { ModalManager } from "@/components/modals"
+import type { FC, ReactNode } from 'react'
+import Navigation from './navigation/Navigation'
+import Footer from './footer/Footer'
+import Provider from './provider/Provider'
+import { ModalManager } from '@/components/modals'
 
 const Layout: FC<{ children: ReactNode }> = ({ children }) => (
   <Provider>

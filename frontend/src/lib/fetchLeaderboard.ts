@@ -1,28 +1,27 @@
-import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
+import type { CosmWasmClient } from '@cosmjs/cosmwasm-stargate'
 
-export type FetchLeaderboardPayload = {
+export interface FetchLeaderboardPayload {
   leaderboard: {
-    start_after?: string,
-    limit?: string,
+    start_after?: string
+    limit?: string
   }
 }
 
-export type FetchLeaderboardResponse = {
-  leaderboard: {
-    painter: string,
-    strokes: string,
-    deposits: string,
-  }[]
-} | null
+export interface FetchLeaderboardResponse {
+  leaderboard: Array<{
+    painter: string
+    strokes: string
+    deposits: string
+  }>
+}
 
-
-export const fetchLeaderboardPayload = (start_after?: string, limit?: string): FetchLeaderboardPayload => (
+export const fetchLeaderboardPayload = (startAfter?: string, limit?: number): FetchLeaderboardPayload => (
   {
     leaderboard: {
-      ...(start_after ? { start_after } : {}),
-      ...(limit ? { limit } : {}),
+      ...(startAfter === undefined ? {} : { start_after: startAfter }),
+      ...(limit === undefined ? {} : { limit: limit.toString() })
     }
   }
 )
 
-export const fetchLeaderboard = async (client: CosmWasmClient, contract: string, start_after?: string, limit?: string): Promise<FetchLeaderboardResponse> => await client.queryContractSmart(contract, fetchLeaderboardPayload(start_after, limit))
+export const fetchLeaderboard = async (client: CosmWasmClient, contract: string, payload: FetchLeaderboardPayload): Promise<FetchLeaderboardResponse> => await client.queryContractSmart(contract, payload) as FetchLeaderboardResponse

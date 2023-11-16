@@ -1,16 +1,16 @@
 'use client'
 
-import { useChainContext, useCosmWasmClient, useFetchBalance } from "@/hooks"
-import { modalAtom } from "@/state"
-import { Modals } from "@/types/Modals"
-import Image from 'next/image';
-import { useSetRecoilState } from "recoil"
-import { Box, Button, Card, CardBody, CardHeading, Container, Text } from "@/components/common"
+import { useChainContext } from '@/hooks'
+import { modalAtom, walletAtom } from '@/state'
+import { ModalTypes } from '@/types/modals'
+import Image from 'next/image'
+import { useRecoilValue, useSetRecoilState } from 'recoil'
+import { Box, Button, Card, CardBody, CardHeading, Container, Text } from '@/components/common'
+import { DECIMALS } from '@/constants'
 
-const ManageWalletModal = () => {
+const ManageWalletModal = (): JSX.Element => {
   const chain = useChainContext()
-  const { cosmWasmClient } = useCosmWasmClient();
-  const { balance } = useFetchBalance(cosmWasmClient, chain.address ?? "", 'uwhale');
+  const wallet = useRecoilValue(walletAtom)
   const setModalState = useSetRecoilState(modalAtom)
 
   return (
@@ -20,9 +20,9 @@ const ManageWalletModal = () => {
         <Box className="w-full flex flex-col gap-2">
           <Text className="text-left font-medium">Balance</Text>
           <Container className="flex flex-row items-center justify-between">
-            <Text>{`${Number(balance?.amount) / 1_000_000} WHALE`}</Text>
+            <Text>{`${Number(wallet.balance.amount) / DECIMALS} WHALE`}</Text>
             <Button variant="secondary">
-              <a target='_blank' href='https://app.kado.money'>Buy</a>
+              <a target='_blank' href='https://app.kado.money' rel="noreferrer">Buy</a>
             </Button>
           </Container>
         </Box>
@@ -30,8 +30,8 @@ const ManageWalletModal = () => {
           <Text className="text-left font-medium">Wallet</Text>
           <Container className="flex flex-row items-center justify-between">
             <Image
-              src={chain.wallet?.logo?.toString() ?? ""}
-              alt={`${chain.wallet?.name} Logo`}
+              src={chain.wallet.logo?.toString() ?? ''}
+              alt={`${chain.wallet.name} Logo`}
               width={32}
               height={32}
             />
@@ -40,8 +40,8 @@ const ManageWalletModal = () => {
               onClick={
                 e => {
                   e.preventDefault()
-                  chain.disconnect()
-                  setModalState(current => ({ ...current, type: Modals.None }))
+                  void chain.disconnect()
+                  setModalState({ data: {}, type: ModalTypes.None })
                 }
               }
             >

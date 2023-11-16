@@ -1,23 +1,28 @@
-import { useState, useEffect, useMemo } from 'react';
-import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
-import useChainContext from './useChainContext';
+import { useState, useEffect, useMemo } from 'react'
+import type { CosmWasmClient } from '@cosmjs/cosmwasm-stargate'
+import { useChainContext } from './useChainContext'
+import type { Async } from '@/types'
 
-const useCosmWasmClient = () => {
-  const chain = useChainContext()
-  const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<unknown>(null);
+export interface UseCosmWasmClientResult extends Async {
+  client: CosmWasmClient | null
+}
 
-  useEffect(() => {
-    const initClients = async () => {
-      setLoading(true);
-      chain.getCosmWasmClient().then(setCosmWasmClient).catch(setError).finally(() => setError(false))
-    }
-    initClients();
-    return () => { };
-  }, []);
+export const useCosmWasmClient = (): UseCosmWasmClientResult => {
+  const chainContext = useChainContext()
+  const [result, setResult] = useState<UseCosmWasmClientResult>({ client: null, loading: false, error: null })
 
-  return useMemo(() => ({ cosmWasmClient, error, loading }), [cosmWasmClient, loading, error])
-};
+  useEffect(
+    () => {
+      setResult(prev => ({ ...prev, loading: true }))
+      chainContext.getCosmWasmClient()
+        .then(client => setResult(prev => ({ ...prev, client, error: null })))
+        .catch(error => setResult(prev => ({ ...prev, error: error as Error })))
+        .finally(() => setResult(prev => ({ ...prev, loading: false })))
+    },
+    // Hack: Cosmos Kit is broken; dependency changes frequently.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
 
-export default useCosmWasmClient;
+  return useMemo(() => result, [result])
+}

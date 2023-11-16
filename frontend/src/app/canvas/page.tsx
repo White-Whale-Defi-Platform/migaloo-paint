@@ -1,3 +1,1 @@
-export { default } from "@/components/canvas"
-
-
+export { default } from '@/components/canvas'

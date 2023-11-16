@@ -1,16 +1,16 @@
-import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
+import type { CosmWasmClient } from '@cosmjs/cosmwasm-stargate'
 
-export type FetchStatsPayload = {
-  stats: {}
+export interface FetchStatsPayload {
+  stats: Record<string, never>
 }
 
-export type FetchStatsResponse = {
+export interface FetchStatsResponse {
   stats: {
-    strokes: string,
-    deposits: string,
+    strokes: string
+    deposits: string
   }
-} | null
+}
 
 export const fetchStatsPayload = (): FetchStatsPayload => ({ stats: {} })
 
-export const fetchStats = async (client: CosmWasmClient, contract: string): Promise<FetchStatsResponse> => await client.queryContractSmart(contract, fetchStatsPayload())
+export const fetchStats = async (client: CosmWasmClient, contract: string, payload: FetchStatsPayload): Promise<FetchStatsResponse> => await client.queryContractSmart(contract, payload) as FetchStatsResponse

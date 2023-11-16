@@ -1,5 +1,5 @@
 'use client'
-import React, { PropsWithChildren, forwardRef, HTMLAttributes } from 'react'
+import React, { type PropsWithChildren, forwardRef, type HTMLAttributes } from 'react'
 
 const Box = forwardRef<HTMLDivElement, PropsWithChildren<HTMLAttributes<HTMLDivElement>>>(
   ({ children, className, ...rest }, ref) => (
@@ -11,5 +11,7 @@ const Box = forwardRef<HTMLDivElement, PropsWithChildren<HTMLAttributes<HTMLDivE
     </div>
   )
 )
+
+Box.displayName = 'Box'
 
 export default React.memo(Box)

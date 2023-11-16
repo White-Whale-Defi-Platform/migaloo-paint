@@ -1,5 +1,5 @@
 'use client'
-import React, { PropsWithChildren, forwardRef, HTMLAttributes } from 'react'
+import React, { type PropsWithChildren, forwardRef, type HTMLAttributes } from 'react'
 
 const Text = forwardRef<HTMLDivElement, PropsWithChildren<HTMLAttributes<HTMLSpanElement>>>(
   ({ children, className, ...rest }, ref) => (
@@ -11,5 +11,5 @@ const Text = forwardRef<HTMLDivElement, PropsWithChildren<HTMLAttributes<HTMLSpa
     </span>
   )
 )
-
+Text.displayName = 'Text'
 export default React.memo(Text)

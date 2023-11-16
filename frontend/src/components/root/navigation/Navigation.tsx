@@ -4,7 +4,7 @@ import Link from 'next/link'
 import NavButton from './NavButton'
 import WalletNav from './WalletNav'
 
-const Navigation = () => (
+const Navigation = (): JSX.Element => (
   <nav className="flex flex-row items-center w-full justify-between">
     <div className="flex flex-row items-center gap-4">
       <Link href='/'>

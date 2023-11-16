@@ -1,5 +1,5 @@
-'use client';
-import React, { PropsWithChildren, forwardRef, HTMLAttributes } from 'react'
+'use client'
+import React, { type PropsWithChildren, forwardRef, type HTMLAttributes } from 'react'
 
 const Card = forwardRef<HTMLDivElement, PropsWithChildren<HTMLAttributes<HTMLDivElement>>>(
   ({ children, className, ...rest }, ref) => (
@@ -11,5 +11,7 @@ const Card = forwardRef<HTMLDivElement, PropsWithChildren<HTMLAttributes<HTMLDiv
     </div>
   )
 )
+
+Card.displayName = 'Card'
 
 export default React.memo(Card)

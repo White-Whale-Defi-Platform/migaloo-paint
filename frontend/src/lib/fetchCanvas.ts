@@ -1,16 +1,23 @@
-import { Tile } from '@/types';
-import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
+import type { CosmWasmClient } from '@cosmjs/cosmwasm-stargate'
 
-export type FetchCanvasPayload = {
+export interface FetchCanvasPayload {
   canvas: {
-    start_after?: string,
-    limit?: string,
+    start_after?: string
+    limit?: string
   }
 }
 
-export type FetchCanvasResponse = { canvas: Tile[] } | null
+export interface FetchCanvasResponse {
+  canvas: Array<{ painter: string, color: string, deposit: string }>
+}
 
-export const fetchCanvasPayload = (start_after?: string, limit?: string): FetchCanvasPayload => ({ canvas: { start_after, limit } })
+export const fetchCanvasPayload = (startAfter?: number, limit?: number): FetchCanvasPayload => (
+  {
+    canvas: {
+      ...(startAfter === undefined ? {} : { start_after: startAfter.toString() }),
+      ...(limit === undefined ? {} : { limit: limit.toString() })
+    }
+  }
+)
 
-export const fetchCanvas = async (client: CosmWasmClient, contract: string, start_after?: string, limit?: string): Promise<FetchCanvasResponse> => await client.queryContractSmart(contract, fetchCanvasPayload(start_after, limit))
-
+export const fetchCanvas = async (client: CosmWasmClient, contract: string, payload: FetchCanvasPayload): Promise<FetchCanvasResponse> => await client.queryContractSmart(contract, payload) as FetchCanvasResponse

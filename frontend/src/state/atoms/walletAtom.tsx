@@ -1,10 +1,20 @@
-import { atom } from 'recoil';
+import { NATIVE_DENOM } from '@/constants'
+import type { Token } from '@/types'
+import { atom } from 'recoil'
 
-const walletAtom = atom(
+export interface WalletState {
+  name: string
+  account: string
+  balance: Token
+}
+
+export const walletAtom = atom<WalletState>(
   {
     key: 'walletAtom',
-    default: "keplr-extension"
+    default: {
+      name: 'keplr-extension',
+      account: '',
+      balance: { denom: NATIVE_DENOM, amount: 0 }
+    }
   }
 )
-
-export default walletAtom

@@ -1,45 +1,45 @@
 'use client'
 
-import { modalAtom } from "@/state"
-import { Modals } from "@/types/Modals"
-import { useRecoilState } from "recoil"
-import { useEffect, useRef } from "react";
-import SelectWalletModal from "./SelectWalletModal";
-import ManageWalletModal from "./ManageWalletModal";
-import TileModal from "./TileModal";
-import LoadingModal from "./LoadingModal";
-import TransactionModal from "./TransactionModal";
+import { modalAtom } from '@/state'
+import { ModalTypes } from '@/types/modals'
+import { useRecoilState } from 'recoil'
+import { useEffect, useRef } from 'react'
+import SelectWalletModal from './SelectWalletModal'
+import ManageWalletModal from './ManageWalletModal'
+import TileModal from './TileModal'
+import LoadingModal from './LoadingModal'
+import TransactionModal from './TransactionModal'
 
-const ModalManager = () => {
+const ModalManager = (): JSX.Element => {
   const [modalState, setModalState] = useRecoilState(modalAtom)
 
-  const ref = useRef<HTMLDivElement>(null);
-  const handleClickOutside = (event: MouseEvent) => {
-    if (ref.current && !ref.current.contains(event.target as Node)) {
-      setModalState(current => ({ ...current, type: Modals.None }))
-    }
-  };
+  const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    window.addEventListener('mousedown', handleClickOutside);
-    return () => window.removeEventListener('mousedown', handleClickOutside);
-  }, [modalState.type]);
+    const handleClickOutside = (event: MouseEvent): void => {
+      if (ref.current !== null && !ref.current.contains(event.target as Node)) {
+        setModalState({ data: {}, type: ModalTypes.None })
+      }
+    }
+    window.addEventListener('mousedown', handleClickOutside)
+    return () => { window.removeEventListener('mousedown', handleClickOutside) }
+  }, [modalState.type, ref, setModalState])
 
   let Modal: JSX.Element
   switch (modalState.type) {
-    case Modals.SelectWallet:
+    case ModalTypes.SelectWallet:
       Modal = <SelectWalletModal />
       break
-    case Modals.ManageWallet:
+    case ModalTypes.ManageWallet:
       Modal = <ManageWalletModal />
       break
-    case Modals.Tile:
+    case ModalTypes.Tile:
       Modal = <TileModal />
       break
-    case Modals.Loading:
+    case ModalTypes.Loading:
       Modal = <LoadingModal />
       break
-    case Modals.Transaction:
+    case ModalTypes.Transaction:
       Modal = <TransactionModal />
       break
     default:
@@ -49,7 +49,7 @@ const ModalManager = () => {
   return (
     <>
       {
-        modalState.type != Modals.None &&
+        modalState.type !== ModalTypes.None &&
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div ref={ref}>
             {Modal}

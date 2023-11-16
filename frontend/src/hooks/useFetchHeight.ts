@@ -1,32 +1,32 @@
-import { useState, useEffect, useMemo } from 'react';
-import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
-import { fetchHeight, FetchHeightResponse } from '@/lib';
+import { useState, useEffect, useMemo } from 'react'
+import { fetchHeight } from '@/lib'
+import { FETCH_INTERVAL } from '@/constants'
+import type { Height } from '@/state'
+import type { Async } from '@/types'
+import { useCosmWasmClient } from './useCosmWasmClient'
 
-const useFetchHeight = (client: CosmWasmClient | null) => {
-  const [height, setHeight] = useState<FetchHeightResponse>(null);
-  const [loading, isLoading] = useState<boolean>(false)
-  const [error, setError] = useState<unknown>(null)
+export interface UseFetchHeightResult extends Async {
+  height: Height | null
+}
+
+export const useFetchHeight = (): UseFetchHeightResult => {
+  const { client } = useCosmWasmClient()
+  const [result, setResult] = useState<UseFetchHeightResult>({ height: null, loading: false, error: null })
 
   useEffect(() => {
-    const fetchAndSet = async () => {
-      if (!client) return
-      isLoading(true)
+    const fetchAndSet = (): void => {
+      if (client === null) return
+      setResult(prev => ({ ...prev, loading: true }))
       fetchHeight(client)
-        .then((respone) => {
-          setHeight(respone)
-          if (respone) {
-            setError(null)
-          }
-        })
-        .catch(setError)
-        .finally(() => isLoading(false))
+        .then(height => setResult(prev => ({ ...prev, height, error: null })))
+        .catch(error => setResult(prev => ({ ...prev, error: error as Error })))
+        .finally(() => setResult(prev => ({ ...prev, loading: false })))
     }
+
     fetchAndSet()
-    const timeout = setInterval(fetchAndSet, 6000)
+    const timeout = setInterval(fetchAndSet, FETCH_INTERVAL)
     return () => clearInterval(timeout)
   }, [client])
 
-  return useMemo(() => ({ height, loading, error }), [height, loading, error]);
+  return useMemo(() => result, [result])
 }
-
-export default useFetchHeight

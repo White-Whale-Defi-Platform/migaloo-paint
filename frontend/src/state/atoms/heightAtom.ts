@@ -1,12 +1,13 @@
-import { atom } from 'recoil';
+import type { Async } from '@/types'
+import { atom } from 'recoil'
 
-export type HeightState = {
-  height: number,
-  loading: boolean,
-  error: unknown,
+export interface Height {
+  height: number
 }
 
-const heightAtom = atom<HeightState>(
+export interface HeightState extends Height, Async { }
+
+export const heightAtom = atom<HeightState>(
   {
     key: 'heightAtom',
     default: {
@@ -16,5 +17,3 @@ const heightAtom = atom<HeightState>(
     }
   }
 )
-
-export default heightAtom

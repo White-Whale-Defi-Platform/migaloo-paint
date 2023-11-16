@@ -1,42 +1,37 @@
-import { atom } from 'recoil';
+import { MIGALOO_PAINT_CONTRACT_ADDRESS } from '@/constants'
+import type { Async } from '@/types'
+import { atom } from 'recoil'
 
-export type ConfigState = {
-  config: {
-    contracts: {
-      paint: string,
-      furnace: string,
-    },
-    canvas: {
-      size: string,
-      color: string,
-      denom: string,
-      deposit: string,
-    }
-  },
-  loading: boolean,
-  error: unknown
-
+export interface Config {
+  contracts: {
+    paint: string
+    furnace: string
+  }
+  canvas: {
+    size: number
+    color: string
+    denom: string
+    deposit: number
+  }
 }
-const configAtom = atom<ConfigState>(
+export interface ConfigState extends Config, Async { }
+
+export const configAtom = atom<ConfigState>(
   {
     key: 'configAtom',
     default: {
-      config: {
-        contracts: {
-          paint: "migaloo150alghj63l2p2wscymh3xr053eu9d95vs0s8zjtru89enjscn32s7yytx7",
-          furnace: ""
-        },
-        canvas: {
-          size: "",
-          color: "",
-          denom: "",
-          deposit: ""
-        }
+      contracts: {
+        paint: MIGALOO_PAINT_CONTRACT_ADDRESS,
+        furnace: ''
+      },
+      canvas: {
+        size: 0,
+        color: '',
+        denom: '',
+        deposit: 0
       },
       loading: true,
       error: null
     }
   }
 )
-
-export default configAtom

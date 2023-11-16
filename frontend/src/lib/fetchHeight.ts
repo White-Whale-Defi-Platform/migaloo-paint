@@ -1,5 +1,7 @@
-import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
+import type { CosmWasmClient } from '@cosmjs/cosmwasm-stargate'
 
-export type FetchHeightResponse = number | null
+export interface FetchHeightResponse {
+  height: number
+}
 
-export const fetchHeight = async (client: CosmWasmClient): Promise<FetchHeightResponse> => await client.getHeight()
+export const fetchHeight = async (client: CosmWasmClient): Promise<FetchHeightResponse> => ({ height: await client.getHeight() })

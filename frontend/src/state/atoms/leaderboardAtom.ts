@@ -1,24 +1,23 @@
-import { atom } from "recoil";
+import type { Async } from '@/types'
+import { atom } from 'recoil'
 
-type LeaderboardEntry = {
-  painter: string;
-  strokes: number;
-  deposits: number;
-};
+export interface LeaderboardEntry {
+  painter: string
+  strokes: number
+  deposits: number
+}
 
-type LeaderboardState = {
-  leaderboard: LeaderboardEntry[];
-  loading: boolean;
-  error: unknown;
-};
+export interface Leaderboard {
+  leaderboard: LeaderboardEntry[]
+}
 
-const leaderboardAtom = atom<LeaderboardState>({
+export interface LeaderboardState extends Leaderboard, Async { }
+
+export const leaderboardAtom = atom<LeaderboardState>({
   key: 'leaderboardAtom',
   default: {
-    leaderboard: Array<LeaderboardEntry>(),
+    leaderboard: [],
     loading: false,
-    error: null,
-  },
-});
-
-export default leaderboardAtom
+    error: null
+  }
+})

@@ -1,50 +1,54 @@
-import { useState, useEffect, useMemo } from 'react';
-import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
-import { fetchLeaderboard, FetchLeaderboardResponse } from '@/lib';
+import { useState, useEffect, useMemo } from 'react'
+import { fetchLeaderboard, fetchLeaderboardPayload } from '@/lib'
+import { FETCH_INTERVAL, LEADERBOAD_FETCH_LIMIT, MIGALOO_PAINT_CONTRACT_ADDRESS, ONE } from '@/constants'
+import type { Leaderboard, LeaderboardEntry } from '@/state'
+import type { Async } from '@/types'
+import { useCosmWasmClient } from './useCosmWasmClient'
 
-const useFetchLeaderboard = (client: CosmWasmClient | null, contract: string) => {
-  const [leaderboard, setLeaderboard] = useState<FetchLeaderboardResponse>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<unknown>(null);
-  const limit = 100
-
-  useEffect(() => {
-    const fetchAndSet = (startAfter: string | undefined = undefined) => {
-      if (!client) return
-      setLoading(true)
-
-      const fetchAllEntries = async (startAfter: string | undefined) => {
-        let lastAccount: string | undefined = startAfter;
-        let allEntriesFetched = false;
-        let combinedLeaderboard = leaderboard?.leaderboard || [];
-
-        while (!allEntriesFetched) {
-          await fetchLeaderboard(client, contract, lastAccount).then(response => {
-            if (!response || !response.leaderboard) {
-              throw new Error('Invalid response');
-            }
-
-            combinedLeaderboard = [...combinedLeaderboard, ...response.leaderboard];
-
-            if (Number(response.leaderboard.length) < limit) {
-              allEntriesFetched = true;
-            } else {
-              lastAccount = response.leaderboard[response.leaderboard.length - 1]?.painter;
-            }
-          }).catch(setError);
-        }
-
-        return combinedLeaderboard;
-      };
-
-      fetchAllEntries(startAfter).then(leaderboard => setLeaderboard({ leaderboard })).finally(() => setLoading(false))
-    };
-
-    fetchAndSet();
-    const interval = setInterval(() => fetchAndSet(), 10000);
-    return () => clearInterval(interval);
-  }, [client, contract])
-  return useMemo(() => ({ leaderboard: leaderboard?.leaderboard, loading, error }), [leaderboard, loading, error]);
+export interface useFetchLeaderboardResult extends Async {
+  leaderboard: Leaderboard | null
 }
 
-export default useFetchLeaderboard;
+export const useFetchLeaderboard = (): useFetchLeaderboardResult => {
+  const { client } = useCosmWasmClient()
+  const [result, setResult] = useState<useFetchLeaderboardResult>({ leaderboard: null, loading: false, error: null })
+
+  useEffect(() => {
+    const fetchAndSet = (): void => {
+      if (client === null) return
+      setResult(prev => ({ ...prev, loading: true }))
+
+      const fetchAllEntries = async (): Promise<Leaderboard> => {
+        let startAfter: string | undefined
+        let allEntriesFetched = false
+        let leaderboard: LeaderboardEntry[] = []
+
+        while (!allEntriesFetched) {
+          const response = await fetchLeaderboard(client, MIGALOO_PAINT_CONTRACT_ADDRESS, fetchLeaderboardPayload(startAfter))
+          leaderboard = [...leaderboard, ...response.leaderboard.map(({ painter, strokes, deposits }) => ({ painter, strokes: Number(strokes), deposits: Number(deposits) }))]
+
+          if (response.leaderboard.length < LEADERBOAD_FETCH_LIMIT) {
+            allEntriesFetched = true
+          } else {
+            startAfter = response.leaderboard.at(-ONE)?.painter
+          }
+        }
+
+        return { leaderboard }
+      }
+
+      fetchAllEntries()
+        .then(leaderboard => setResult(prev => ({ ...prev, leaderboard, error: null })))
+        .catch(error => setResult(prev => ({ ...prev, error: error as Error })))
+        .finally(() => setResult(prev => ({ ...prev, loading: false })))
+    }
+
+    fetchAndSet()
+    const interval = setInterval(() => fetchAndSet, FETCH_INTERVAL)
+    return () => clearInterval(interval)
+  },
+  [client]
+  )
+
+  return useMemo(() => result, [result])
+}

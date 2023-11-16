@@ -1,22 +1,24 @@
 'use client'
-import { modalAtom } from "@/state"
-import { useChain } from "@cosmos-kit/react"
-import { useSetRecoilState } from "recoil"
-import Image from 'next/image';
-import { Modals } from "@/types/Modals";
-import { Card, CardHeading, CardBody, Button, Container } from '@/components/common'
-import CardContent from "../common/card/CardContent";
+export const SelectWalletModal = (): JSX.Element => <></>
 
-const SelectWalletModal = () => {
-  const chain = useChain("migaloo")
-  const setModalState = useSetRecoilState(modalAtom)
+/*
+import { modalAtom, walletAtom } from '@/state'
+import Image from 'next/image'
+import { ModalTypes } from '@/types/modals'
+import { Card, CardHeading, CardBody, Button, CardContent } from '@/components/common'
+import { useChainContext } from '@/hooks'
+import { useChainWallet } from '@cosmos-kit/react'
+
+const SelectWalletModal = (): JSX.Element => {
+  const chainContext = useChainContext()
+  const setModalState = useChainWallet('migaloo', "keplr-extension")
 
   return (
     <Card className="w-96">
       <CardHeading>Select Wallet</CardHeading>
       <CardBody>
         <CardContent className="w-full flex flex-col">
-          {chain.walletRepo?.wallets.map((wallet) => (
+          {chainContext.walletRepo.wallets.map((wallet) => (
             <Button
               key={wallet.walletName}
               variant="secondary"
@@ -24,13 +26,13 @@ const SelectWalletModal = () => {
               onClick={
                 e => {
                   e.preventDefault()
-                  wallet.connect()
-                  setModalState(current => ({ ...current, type: Modals.None }))
+                  void wallet.connect()
+                  setModalState({ data: {}, type: ModalTypes.None })
                 }
               }
             >
               <Image
-                src={wallet.walletInfo.logo?.toString() ?? ""}
+                src={wallet.walletInfo.logo?.toString() ?? ''}
                 alt={`${wallet.walletInfo.name} Logo`}
                 width={32}
                 height={32}
@@ -45,3 +47,4 @@ const SelectWalletModal = () => {
 }
 
 export default SelectWalletModal
+*/

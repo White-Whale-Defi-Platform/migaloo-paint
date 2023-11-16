@@ -1,13 +1,11 @@
 module.exports = {
-  async redirects() {
+  async redirects () {
     return [
       {
         source: '/',
         destination: '/canvas',
-        permanent: true, 
-      },
+        permanent: true
+      }
     ]
-  },
+  }
 }
-
-

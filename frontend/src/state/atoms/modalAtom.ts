@@ -1,19 +1,17 @@
-import { Modals } from '@/types/Modals';
-import { atom } from 'recoil';
+import { type ModalData, ModalTypes } from '@/types/modals'
+import { atom } from 'recoil'
 
-export type ModalState = {
-  type: Modals
-  data: any
+export interface ModalState {
+  type: ModalTypes
+  data: ModalData
 }
 
-const modalAtom = atom<ModalState>(
+export const modalAtom = atom<ModalState>(
   {
     key: 'modalAtom',
     default: {
-      type: Modals.None,
-      data: null
+      type: ModalTypes.None,
+      data: {}
     }
   }
 )
-
-export default modalAtom

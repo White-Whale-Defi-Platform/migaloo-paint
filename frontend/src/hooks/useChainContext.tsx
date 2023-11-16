@@ -1,12 +1,8 @@
-import { walletAtom } from "@/state"
-import { useChain, useChainWallet } from "@cosmos-kit/react"
-import { useRecoilValue } from "recoil"
+import type { ChainWalletContext } from '@cosmos-kit/core'
+import { useChainWallet } from '@cosmos-kit/react'
 
-const useChainContext = () => {
-  const wallet = useRecoilValue(walletAtom)
-  //const chain = useChainWallet("migaloo", wallet, true)
-  const chain = useChain("migaloo")
+export const useChainContext = (): ChainWalletContext => {
+  const chain = useChainWallet('migaloo', 'keplr-extension')
+
   return chain
 }
-
-export default useChainContext

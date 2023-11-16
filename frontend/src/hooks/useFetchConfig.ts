@@ -1,22 +1,46 @@
-import { useEffect, useMemo, useState } from "react"
-import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
-import { FetchConfigResponse, fetchConfig } from '@/lib'
+import { useEffect, useMemo, useState } from 'react'
+import { fetchConfig, fetchConfigPayload } from '@/lib'
+import type { Config } from '@/state'
+import type { Async } from '@/types'
+import { MIGALOO_PAINT_CONTRACT_ADDRESS } from '@/constants'
+import { useCosmWasmClient } from './useCosmWasmClient'
 
-const useFetchConfig = (client: CosmWasmClient | null, contract: string) => {
-  const [config, setConfig] = useState<FetchConfigResponse>(null);
-  const [loading, isLoading] = useState<boolean>(false)
-  const [error, setError] = useState<unknown>(null)
-
-  useEffect(() => {
-    const fetchAndSet = async () => {
-      if (!client) return
-      isLoading(true)
-      fetchConfig(client, contract).then(setConfig).catch(setError).finally(() => isLoading(false))
-    }
-    fetchAndSet()
-  }, [client, contract])
-
-  return useMemo(() => ({ config, loading, error }), [config, loading, error]);
+export interface UseFetchConfigResult extends Async {
+  config: Config | null
 }
 
-export default useFetchConfig
+export const useFetchConfig = (): UseFetchConfigResult => {
+  const { client } = useCosmWasmClient()
+  const [result, setResult] = useState<UseFetchConfigResult>({ config: null, loading: false, error: null })
+
+  useEffect(() => {
+    const fetchAndSet = (): void => {
+      if (client === null) return
+      setResult(prev => ({ ...prev, loading: true }))
+      fetchConfig(client, MIGALOO_PAINT_CONTRACT_ADDRESS, fetchConfigPayload())
+        .then(({ config: { furnace, color, size, coin: { denom, amount } } }) => setResult(prev => ({
+          ...prev,
+          config: {
+            contracts: {
+              paint: MIGALOO_PAINT_CONTRACT_ADDRESS,
+              furnace
+            },
+            canvas: {
+              size: Number(size),
+              color,
+              denom,
+              deposit: Number(amount)
+            }
+          },
+          error: null
+        })))
+        .catch(error => setResult(prev => ({ ...prev, error: error as Error })))
+        .finally(() => setResult(prev => ({ ...prev, loading: false })))
+    }
+    fetchAndSet()
+  },
+  [client]
+  )
+
+  return useMemo(() => result, [result])
+}

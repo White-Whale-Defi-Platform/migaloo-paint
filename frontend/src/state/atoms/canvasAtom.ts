@@ -1,21 +1,25 @@
-import { Tile } from '@/types';
-import { atom } from 'recoil';
+import type { Async } from '@/types'
+import { atom } from 'recoil'
 
-export type CanvasState = {
-  canvas: Tile[],
-  loading: boolean,
-  error: unknown,
+export interface Tile {
+  painter: string
+  color: string
+  deposit: number
 }
 
-const canvasAtom = atom<CanvasState>(
+export interface Canvas {
+  tiles: Tile[]
+}
+
+export interface CanvasState extends Canvas, Async { }
+
+export const canvasAtom = atom<CanvasState>(
   {
     key: 'canvasAtom',
     default: {
-      canvas: Array<Tile>(),
+      tiles: [],
       loading: true,
-      error: null,
+      error: null
     }
   }
 )
-
-export default canvasAtom

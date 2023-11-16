@@ -1,80 +1,94 @@
 'use client'
-import { FC, ReactNode, useEffect } from 'react';
-import { useRecoilState, useSetRecoilState } from 'recoil'
-import { canvasAtom, configAtom, heightAtom, leaderboardAtom, statsAtom } from '@/state';
-import { useCosmWasmClient, useFetchCanvas, useFetchConfig, useFetchHeight, useFetchLeaderboard, useFetchStats } from '@/hooks';
+import { type FC, useEffect, type PropsWithChildren } from 'react'
+import { useSetRecoilState } from 'recoil'
+import { canvasAtom, configAtom, heightAtom, leaderboardAtom, statisticsAtom, walletAtom } from '@/state'
+import { useChainContext, useFetchAccountBalance, useFetchCanvas, useFetchConfig, useFetchHeight, useFetchLeaderboard, useFetchStatistics } from '@/hooks'
 
-const DataProvider: FC<{ children: ReactNode }> = ({ children }) => {
-  const { cosmWasmClient } = useCosmWasmClient()
-
-  const [{ config: { contracts: { paint } } }, setConfig] = useRecoilState(configAtom)
+const DataProvider: FC<PropsWithChildren> = ({ children }) => {
+  const chainContext = useChainContext()
+  const setConfig = useSetRecoilState(configAtom)
   const setHeight = useSetRecoilState(heightAtom)
   const setCanvas = useSetRecoilState(canvasAtom)
   const setLeaderboard = useSetRecoilState(leaderboardAtom)
-  const setStats = useSetRecoilState(statsAtom)
+  const setStatistics = useSetRecoilState(statisticsAtom)
+  const SetWallet = useSetRecoilState(walletAtom)
 
-  const fetchConfigResponse = useFetchConfig(cosmWasmClient, paint)
-  const fetchCanvasResponse = useFetchCanvas(cosmWasmClient, paint)
-  const fetchLeaderboardResponse = useFetchLeaderboard(cosmWasmClient, paint)
-  const fetchStatsResponse = useFetchStats(cosmWasmClient, paint)
-  const fetchHeightResponse = useFetchHeight(cosmWasmClient)
+  const configFetch = useFetchConfig()
+  const canvasFetch = useFetchCanvas()
+  const leaderboardFetch = useFetchLeaderboard()
+  const statisticsFetch = useFetchStatistics()
+  const heightFetch = useFetchHeight()
+  const accountBalanceFetch = useFetchAccountBalance()
 
-  useEffect(() => {
-    const { config, loading, error } = fetchConfigResponse
-    setConfig(current => ({
-      config: {
+  useEffect(() =>
+    setConfig(current => (
+      {
         canvas: {
-          size: config?.config.size ?? current.config.canvas.size,
-          color: config?.config.color ?? current.config.canvas.color,
-          denom: config?.config.coin.denom ?? current.config.canvas.denom,
-          deposit: config?.config.coin.amount ?? current.config.canvas.deposit,
+          size: configFetch.config?.canvas.size ?? current.canvas.size,
+          color: configFetch.config?.canvas.color ?? current.canvas.color,
+          denom: configFetch.config?.canvas.denom ?? current.canvas.denom,
+          deposit: configFetch.config?.canvas.deposit ?? current.canvas.deposit
         },
         contracts: {
-          paint: current.config.contracts.paint,
-          furnace: config?.config.furnace ?? current.config.contracts.furnace,
-        }
-      },
-      loading,
-      error,
-    }));
-
-  }, [fetchConfigResponse]);
+          paint: current.contracts.paint,
+          furnace: configFetch.config?.contracts.furnace ?? current.contracts.furnace
+        },
+        loading: configFetch.loading,
+        error: configFetch.error
+      })), [configFetch, setConfig])
 
   useEffect(
-    () => setCanvas(current => ({
-      ...fetchCanvasResponse,
-      canvas: fetchCanvasResponse.canvas ?? current.canvas,
-    })),
-    [fetchCanvasResponse],
+    () => setCanvas(current => (
+      {
+        tiles: canvasFetch.canvas?.tiles ?? current.tiles,
+        loading: canvasFetch.loading,
+        error: canvasFetch.error
+      }
+    )),
+    [canvasFetch, setCanvas]
   )
+
   useEffect(
     () => setLeaderboard(current => ({
-      ...fetchLeaderboardResponse,
-      leaderboard: fetchLeaderboardResponse.leaderboard?.map(e => ({ painter: e.painter, deposits: Number(e.deposits), strokes: Number(e.strokes) })) ?? current.leaderboard,
+      leaderboard: leaderboardFetch.leaderboard?.leaderboard ?? current.leaderboard,
+      loading: leaderboardFetch.loading,
+      error: leaderboardFetch.error
     })),
-    [fetchLeaderboardResponse],
+    [leaderboardFetch, setLeaderboard]
   )
   useEffect(
-    () => setHeight(current => ({
-      height: Number(fetchHeightResponse.height) ?? current.height,
-      loading: fetchHeightResponse.loading,
-      error: fetchHeightResponse.error,
-    })),
-    [fetchHeightResponse],
+    () => {
+      setHeight(current => ({
+        height: heightFetch.height?.height ?? current.height,
+        loading: heightFetch.loading,
+        error: heightFetch.error
+      }))
+    },
+    [heightFetch, setHeight]
   )
   useEffect(
-    () => setStats(current => ({
-      stats: {
-        deposits: Number(fetchStatsResponse.stats?.deposits) ?? current.stats.deposits,
-        strokes: Number(fetchStatsResponse.stats?.strokes) ?? current.stats.strokes,
-      },
-      loading: fetchStatsResponse.loading,
-      error: fetchStatsResponse.error
+    () => setStatistics(current => ({
+      deposits: statisticsFetch.statistics?.deposits ?? current.deposits,
+      strokes: statisticsFetch.statistics?.strokes ?? current.strokes,
+      loading: statisticsFetch.loading,
+      error: statisticsFetch.error
     })),
-    [fetchStatsResponse],
+    [statisticsFetch, setStatistics]
+  )
+  useEffect(
+    () => SetWallet(current => ({
+      ...current,
+      balance: accountBalanceFetch.balance ?? current.balance
+    })),
+    [accountBalanceFetch, SetWallet]
   )
 
-  return <>{children}</>;
-};
+  useEffect(
+    () => SetWallet(prev => ({ ...prev, account: chainContext.address ?? prev.account })),
+    [chainContext.address, SetWallet]
+  )
+
+  return <>{children}</>
+}
 
 export default DataProvider

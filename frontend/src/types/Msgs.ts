@@ -1,8 +1,6 @@
-export interface Msg { }
-
-export interface PaintMsg extends Msg {
+export interface PaintMsg {
   paint: {
-    color: string,
-    position: string,
+    color: string
+    position: string
   }
 }

@@ -1,7 +1,8 @@
-import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
-import { Coin } from '@cosmjs/stargate';
+import type { CosmWasmClient } from '@cosmjs/cosmwasm-stargate'
+import type { Coin } from '@cosmjs/stargate'
 
-export type FetchBalanceResponse = Coin | null
+export interface FetchBalanceResponse {
+  balance: Coin
+}
 
-export const fetchBalance = async (client: CosmWasmClient, address: string, denom: string): Promise<FetchBalanceResponse> => await client.getBalance(address, denom)
-
+export const fetchBalance = async (client: CosmWasmClient, address: string, denom: string): Promise<FetchBalanceResponse> => ({ balance: await client.getBalance(address, denom) })

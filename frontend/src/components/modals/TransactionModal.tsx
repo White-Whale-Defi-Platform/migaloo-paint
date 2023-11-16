@@ -3,11 +3,12 @@
 import { ZERO } from '@/constants'
 import { modalAtom } from '@/state'
 import type { TransactionModalData } from '@/types'
+import { exploreTx } from '@/util'
 import { formatHash } from '@/util/format'
 import { useRecoilValue } from 'recoil'
 import { Box, Button, Card, CardBody, CardHeading, CardContent, Text } from '../common'
 
-const TransactionModal = (): JSX.Element => {
+export const TransactionModal = (): JSX.Element => {
   const state = useRecoilValue(modalAtom)
   const { code, height, hash } = state.data as unknown as TransactionModalData
   return (
@@ -30,7 +31,7 @@ const TransactionModal = (): JSX.Element => {
         <Button
           variant="secondary"
           className="w-full"
-          onClick={() => window.open(`https://ping.pub/migaloo/tx/${hash}`, '_blank')}
+          onClick={() => window.open(exploreTx(hash), '_blank')}
         >
           Explore
         </Button>
@@ -38,5 +39,3 @@ const TransactionModal = (): JSX.Element => {
     </Card >
   )
 }
-
-export default TransactionModal

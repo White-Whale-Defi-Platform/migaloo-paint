@@ -4,11 +4,12 @@ import { modalAtom } from '@/state'
 import { ModalTypes } from '@/types/modals'
 import { useRecoilState } from 'recoil'
 import { useEffect, useRef } from 'react'
-import SelectWalletModal from './SelectWalletModal'
-import ManageWalletModal from './ManageWalletModal'
-import TileModal from './TileModal'
-import LoadingModal from './LoadingModal'
-import TransactionModal from './TransactionModal'
+import { SelectWalletModal } from './SelectWalletModal'
+import { ManageWalletModal } from './ManageWalletModal'
+import { TileModal } from './TileModal'
+import { LoadingModal } from './LoadingModal'
+import { TransactionModal } from './TransactionModal'
+import { RequestRejectedModal } from './RequestRejectedModal'
 
 const ModalManager = (): JSX.Element => {
   const [modalState, setModalState] = useRecoilState(modalAtom)
@@ -41,6 +42,9 @@ const ModalManager = (): JSX.Element => {
       break
     case ModalTypes.Transaction:
       Modal = <TransactionModal />
+      break
+    case ModalTypes.RequestRejected:
+      Modal = <RequestRejectedModal />
       break
     default:
       Modal = <></>

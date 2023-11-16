@@ -5,10 +5,10 @@ import { modalAtom, walletAtom } from '@/state'
 import { ModalTypes } from '@/types/modals'
 import Image from 'next/image'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
-import { Box, Button, Card, CardBody, CardHeading, Container, Text } from '@/components/common'
+import { Box, Button, Card, CardBody, CardHeading, Container, Link, Text } from '@/components/common'
 import { DECIMALS } from '@/constants'
 
-const ManageWalletModal = (): JSX.Element => {
+export const ManageWalletModal = (): JSX.Element => {
   const chain = useChainContext()
   const wallet = useRecoilValue(walletAtom)
   const setModalState = useSetRecoilState(modalAtom)
@@ -22,7 +22,7 @@ const ManageWalletModal = (): JSX.Element => {
           <Container className="flex flex-row items-center justify-between">
             <Text>{`${Number(wallet.balance.amount) / DECIMALS} WHALE`}</Text>
             <Button variant="secondary">
-              <a target='_blank' href='https://app.kado.money' rel="noreferrer">Buy</a>
+              <Link target='_blank' href='https://app.kado.money' rel="noreferrer">Buy</Link>
             </Button>
           </Container>
         </Box>
@@ -53,5 +53,3 @@ const ManageWalletModal = (): JSX.Element => {
     </Card>
   )
 }
-
-export default ManageWalletModal

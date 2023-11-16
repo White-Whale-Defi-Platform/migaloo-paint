@@ -3,14 +3,14 @@
 import React, { useEffect } from 'react'
 import { useRecoilValue, useRecoilState } from 'recoil'
 import { useChainContext, useSigningCosmWasmClient } from '@/hooks'
-import { createPaintMessage, formatAddress, formatBalance, isHexColor } from '@/util'
+import { createPaintMessage, exploreAccount, formatAddress, formatBalance, isHexColor } from '@/util'
 import { configAtom, modalAtom } from '@/state'
 import Box from '../common/Box'
-import { Button, Text, CardContent, Card, CardHeading, CardBody, Container } from '@/components/common'
+import { Button, Text, CardContent, Card, CardHeading, CardBody, Container, Link } from '@/components/common'
 import { ModalTypes, type TileModalData } from '@/types'
 import { DECIMALS } from '@/constants'
 
-const TileModal = (): JSX.Element => {
+export const TileModal = (): JSX.Element => {
   const [modalState, setModalState] = useRecoilState(modalAtom)
   const data = modalState.data as unknown as TileModalData
   const chainContext = useChainContext()
@@ -43,11 +43,8 @@ const TileModal = (): JSX.Element => {
           gas: '500000'
         }
       ).then(({ code, transactionHash: hash, height }) => { setModalState({ type: ModalTypes.Transaction, data: { code, height, hash } }) }
-      ).catch(
-        (e) => { console.log('error', e) } // TODO show other modal
+      ).catch(() => setModalState({ data: {}, type: ModalTypes.RequestRejected })
       ).finally()
-    } else {
-      setModalState(current => ({ data: {}, type: ModalTypes.None }))
     }
   }
 
@@ -62,9 +59,9 @@ const TileModal = (): JSX.Element => {
         <CardContent className='w-full flex flex-row items-center justify-between'>
           <Box className="flex-grow flex flex-col items-center justify-center gap-2">
             <Text>Painter</Text>
-            <a target="_blank" href={`https://ping.pub/migaloo/account/${data.painter}`} rel="noreferrer">
+            <Link target="_blank" href={exploreAccount(data.painter)} rel="noreferrer">
               {formatAddress(data.painter)}
-            </a>
+            </Link>
           </Box>
           <Box className="flex-grow flex flex-col items-center justify-center gap-2">
             <Text>Color</Text>
@@ -89,14 +86,14 @@ const TileModal = (): JSX.Element => {
         <div className="flex flex-col gap-2">
           <input
             type="text"
-            className={`bg-neutral-900 border border-solid text-neutral-300 rounded-md py-1 px-2 outline-none ${colorIsValid ? 'border-green-500' : 'border-red-500'}`}
+            className={`bg-neutral-900 border border-solid text-neutral-300 rounded-md py-1 px-2 outline-none border-opacity-40 ${colorIsValid ? 'border-green-500' : 'border-red-500'}`}
             value={input.color}
             onChange={(e) => { setInput(current => ({ ...current, color: e.target.value })) }}
             onFocus={(e) => { e.target.select() }}
           />
           <input
             type="text"
-            className={`bg-neutral-900 border border-solid text-neutral-300 rounded-md py-1 px-2 outline-none ${depositIsValid ? 'border-green-500' : 'border-red-500'}`}
+            className={`bg-neutral-900 border border-solid text-neutral-300 rounded-md py-1 px-2 outline-none border-opacity-40 ${depositIsValid ? 'border-green-500' : 'border-red-500'}`}
             value={input.deposit}
             onChange={(e) => { setInput(current => ({ ...current, deposit: e.target.value })) }}
             onFocus={(e) => { e.target.select() }}
@@ -116,5 +113,3 @@ const TileModal = (): JSX.Element => {
     </Card>
   )
 }
-
-export default TileModal

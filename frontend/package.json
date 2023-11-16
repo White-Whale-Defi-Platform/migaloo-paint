@@ -1,6 +1,6 @@
 {
   "name": "migaloo-paint",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -13,9 +13,7 @@
     "@cosmjs/stargate": "^0.31.3",
     "@cosmos-kit/core": "^2.7.6",
     "@cosmos-kit/keplr": "^2.4.10",
-    "@cosmos-kit/leap": "^2.4.9",
     "@cosmos-kit/react": "^2.9.8",
-    "@cosmos-kit/station": "^2.4.6",
     "chain-registry": "^1.20.0",
     "husky": "^8.0.3",
     "next": "^14.0.1",

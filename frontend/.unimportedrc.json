@@ -14,9 +14,8 @@
     "react",
     "react-dom",
     "unimported",
-    "@cosmos-kit/keplr",
-    "@cosmos-kit/station",
-    "@cosmos-kit/leap"
+    "husky",
+    "@cosmos-kit/keplr"
   ],
   "ignoreUnresolved": [],
   "entry": [

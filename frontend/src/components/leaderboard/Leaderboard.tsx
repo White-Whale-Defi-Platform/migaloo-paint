@@ -1,17 +1,17 @@
 'use client'
 import { DECIMALS, ONE } from '@/constants'
 import { leaderboardAtom, statisticsAtom } from '@/state'
-import { formatAddress, formatBalance } from '@/util'
+import { exploreAccount, formatAddress, formatBalance } from '@/util'
 import Counter from 'react-countup'
 import { useRecoilValue } from 'recoil'
-import { Box, Card, CardBody, CardHeading, Container, Text } from '../common'
+import { Box, Card, CardBody, CardHeading, Container, Link, Text } from '../common'
 
 const Leaderboard = (): JSX.Element => {
-  const leaderboard = useRecoilValue(leaderboardAtom)
+  const { leaderboard } = useRecoilValue(leaderboardAtom)
   const stats = useRecoilValue(statisticsAtom)
 
   const data = [
-    { title: 'Painter', value: leaderboard.leaderboard.length },
+    { title: 'Painter', value: leaderboard.length },
     { title: 'Strokes', value: stats.strokes },
     { title: 'Whale', value: stats.deposits / DECIMALS }
   ]
@@ -28,30 +28,31 @@ const Leaderboard = (): JSX.Element => {
             </Box>
           ))}
         </Container>
-        <Container className="max-h-[40vh] w-full overflow-y-auto">
-          <table className="w-full table-auto">
-            <thead>
-              <tr>
-                {
-                  ['Rank', 'Painter', 'Strokes', 'Whale']
-                    .map((e, i) => <th key={i} className="text-md font-medium text-left pb-1">{e}</th>)
-                }
-              </tr>
-            </thead>
-            <tbody>
-              {[...leaderboard.leaderboard]
-                .sort((a, b) => b.strokes - a.strokes)
-                .map((item, index) => (
-                  <tr key={index}>
-                    <td className="text-md text-left pt-1">{`#${index + ONE}`}</td>
-                    <td className="text-md text-left pt-1 hover:text-neutral-200"><a target="_blank" href={`https://ping.pub/migaloo/account/${item.painter}`} rel="noreferrer">{formatAddress(item.painter)}</a></td>
-                    <td className="text-md text-left pt-1">{item.strokes}</td>
-                    <td className="text-md text-left pt-1">{formatBalance(item.deposits)}</td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
-        </Container>
+        <table className="w-full">
+          <thead>
+            <tr className='flex w-full pb-2'>
+              <th className="text-md font-medium text-left w-1/4">Rank</th>
+              <th className="text-md font-medium text-right w-1/4">Painter</th>
+              <th className="text-md font-medium text-right w-1/4">Strokes</th>
+              <th className="text-md font-medium text-right w-1/4">Whale</th>
+            </tr>
+          </thead>
+          <tbody className="hide-scrollbar max-h-[30vh] bg-grey-light flex flex-col items-center justify-between overflow-y-scroll w-full">
+
+            {[...leaderboard]
+              .sort((a, b) => b.strokes - a.strokes)
+              .map((item, index) => (
+                <tr key={index} className="flex w-full pt-1">
+                  <td className="text-md text-left w-1/4">{`#${index + ONE}`}</td>
+                  <td className="text-md text-right w-1/4"><Link target="_blank" href={exploreAccount(item.painter)} rel="noreferrer">{formatAddress(item.painter)}</Link></td>
+                  <td className="text-md text-right w-1/4">{item.strokes}</td>
+                  <td className="text-md text-right w-1/4">{formatBalance(item.deposits)}</td>
+                </tr>
+              ))}
+
+          </tbody>
+
+        </table>
       </CardBody>
     </Card>
   )

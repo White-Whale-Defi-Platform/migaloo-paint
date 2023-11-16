@@ -1,5 +1,6 @@
 'use client'
-export const SelectWalletModal = (): JSX.Element => <></>
+const SelectWalletModal = (): JSX.Element => <></>
+export default SelectWalletModal
 
 /*
 import { modalAtom, walletAtom } from '@/state'

@@ -30,7 +30,8 @@ const WalletNav = (): JSX.Element => {
           className={'text-md font-medium p-2 rounded-2xl bg-green-500 bg-opacity-20 text-green-400 hover:bg-green-400 hover:bg-opacity-40'}
           onClick={(e) => {
             e.preventDefault()
-            void chainContext.connect()
+            setModal(prev => ({ ...prev, data: {}, type: ModalTypes.Loading }))
+            void chainContext.connect().catch().finally(() => setModal(prev => ({ ...prev, data: {}, type: ModalTypes.None })))
           }}
         >
           Connect Keplr

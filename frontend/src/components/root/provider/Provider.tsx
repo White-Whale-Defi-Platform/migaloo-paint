@@ -5,6 +5,7 @@ import { ChainProvider } from '@cosmos-kit/react'
 import { chains, assets } from 'chain-registry'
 import { wallets as keplr } from '@cosmos-kit/keplr-extension'
 import DataProvider from './DataProvider'
+import { ENDPOINTS } from '@/constants'
 
 const Provider: FC<PropsWithChildren> = ({ children }) => {
   return (
@@ -16,12 +17,7 @@ const Provider: FC<PropsWithChildren> = ({ children }) => {
         walletModal={() => <></>} // Hack: Cosmos Kit is broken; use internal modal manager.
         endpointOptions={{
           isLazy: true,
-          endpoints: {
-            migaloo: {
-              rpc: ['https://migaloo-rpc.polkachu.com'],
-              rest: ['https://migaloo-api.polkachu.com']
-            }
-          }
+          endpoints: ENDPOINTS
         }}>
         <DataProvider>
           {children}

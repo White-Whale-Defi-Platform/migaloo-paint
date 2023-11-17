@@ -1,5 +1,7 @@
+'use client'
+
 import { useEffect, useMemo, useState } from 'react'
-import { fetchConfig, fetchConfigPayload } from '@/lib'
+import { fetchConfig } from '@/lib'
 import type { Config } from '@/state'
 import type { Async } from '@/types'
 import { MIGALOO_PAINT_CONTRACT_ADDRESS } from '@/constants'
@@ -17,7 +19,7 @@ export const useFetchConfig = (): UseFetchConfigResult => {
     const fetchAndSet = (): void => {
       if (client === null) return
       setResult(prev => ({ ...prev, loading: true }))
-      fetchConfig(client, MIGALOO_PAINT_CONTRACT_ADDRESS, fetchConfigPayload())
+      fetchConfig()
         .then(({ config: { furnace, color, size, coin: { denom, amount } } }) => setResult(prev => ({
           ...prev,
           config: {

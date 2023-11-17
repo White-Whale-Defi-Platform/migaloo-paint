@@ -1,3 +1,5 @@
+'use client'
+
 import { useState, useEffect, useMemo } from 'react'
 import type { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate'
 import type { Async } from '@/types'

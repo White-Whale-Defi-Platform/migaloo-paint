@@ -1,3 +1,4 @@
+'use client'
 import { useState, useEffect, useMemo } from 'react'
 import { fetchBalance } from '@/lib'
 import type { Async, Token } from '@/types'

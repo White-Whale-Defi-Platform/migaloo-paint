@@ -1,4 +1,6 @@
-import type { CosmWasmClient } from '@cosmjs/cosmwasm-stargate'
+import { CANVAS_FETCH_LIMIT, ENDPOINTS, MIGALOO_PAINT_CONTRACT_ADDRESS, ZERO } from '@/constants'
+import type { AxiosResponse } from 'axios'
+import { fetchSmartContract } from './fetchSmartContract'
 
 export interface FetchCanvasPayload {
   canvas: {
@@ -20,4 +22,9 @@ export const fetchCanvasPayload = (startAfter?: number, limit?: number): FetchCa
   }
 )
 
-export const fetchCanvas = async (client: CosmWasmClient, contract: string, payload: FetchCanvasPayload): Promise<FetchCanvasResponse> => await client.queryContractSmart(contract, payload) as FetchCanvasResponse
+export const fetchCanvas = async (startAfter?: number, limit: number = CANVAS_FETCH_LIMIT): Promise<FetchCanvasResponse> => await fetchSmartContract(
+  ENDPOINTS.migaloo.rest[ZERO],
+  MIGALOO_PAINT_CONTRACT_ADDRESS,
+  fetchCanvasPayload(startAfter, limit)
+)
+  .then((response: AxiosResponse<{ data: FetchCanvasResponse }>) => response.data.data)

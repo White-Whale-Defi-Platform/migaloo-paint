@@ -1,3 +1,5 @@
+'use client'
+
 import { useState, useEffect, useMemo } from 'react'
 import { fetchHeight } from '@/lib'
 import { FETCH_INTERVAL } from '@/constants'

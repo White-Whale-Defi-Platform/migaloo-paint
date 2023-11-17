@@ -19,3 +19,11 @@ export const CANVAS_FETCH_LIMIT = 10_000
 export const HASH_FORMAT_LENGTH = 4
 export const ADDRESS_FORMAT_LENGTH = 4
 export const BALANCE_FORMAT_DECIMALS = 2
+
+// api
+export const ENDPOINTS = {
+  migaloo: {
+    rpc: ['https://migaloo-rpc.polkachu.com'],
+    rest: ['https://migaloo-api.polkachu.com']
+  }
+}

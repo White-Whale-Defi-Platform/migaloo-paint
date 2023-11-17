@@ -1,6 +1,8 @@
+'use client'
+
 import { useEffect, useMemo, useState } from 'react'
-import { fetchStats, fetchStatsPayload } from '@/lib'
-import { FETCH_INTERVAL, MIGALOO_PAINT_CONTRACT_ADDRESS } from '@/constants'
+import { fetchStatistics } from '@/lib'
+import { FETCH_INTERVAL } from '@/constants'
 import type { Statistics } from '@/state'
 import type { Async } from '@/types'
 import { useCosmWasmClient } from './useCosmWasmClient'
@@ -18,7 +20,7 @@ export const useFetchStatistics = (): UseFetchStatsisticsResult => {
       const fetchAndSet = (): void => {
         if (client === null) return
         setResult(prev => ({ ...prev, loading: true }))
-        fetchStats(client, MIGALOO_PAINT_CONTRACT_ADDRESS, fetchStatsPayload())
+        fetchStatistics()
           .then(({ stats: { strokes, deposits } }) => setResult(prev => ({ ...prev, statistics: { strokes: Number(strokes), deposits: Number(deposits) }, error: null })))
           .catch(error => setResult(prev => ({ ...prev, error: error as Error })))
           .finally(() => setResult(prev => ({ ...prev, loading: false })))

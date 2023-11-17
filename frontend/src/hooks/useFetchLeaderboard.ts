@@ -1,6 +1,8 @@
+'use client'
+
 import { useState, useEffect, useMemo } from 'react'
-import { fetchLeaderboard, fetchLeaderboardPayload } from '@/lib'
-import { FETCH_INTERVAL, LEADERBOAD_FETCH_LIMIT, MIGALOO_PAINT_CONTRACT_ADDRESS, ONE } from '@/constants'
+import { fetchLeaderboard } from '@/lib'
+import { FETCH_INTERVAL, LEADERBOAD_FETCH_LIMIT, ONE } from '@/constants'
 import type { Leaderboard, LeaderboardEntry } from '@/state'
 import type { Async } from '@/types'
 import { useCosmWasmClient } from './useCosmWasmClient'
@@ -24,7 +26,7 @@ export const useFetchLeaderboard = (): useFetchLeaderboardResult => {
         let leaderboard: LeaderboardEntry[] = []
 
         while (!allEntriesFetched) {
-          const response = await fetchLeaderboard(client, MIGALOO_PAINT_CONTRACT_ADDRESS, fetchLeaderboardPayload(startAfter))
+          const response = await fetchLeaderboard(startAfter)
           leaderboard = [...leaderboard, ...response.leaderboard.map(({ painter, strokes, deposits }) => ({ painter, strokes: Number(strokes), deposits: Number(deposits) }))]
 
           if (response.leaderboard.length < LEADERBOAD_FETCH_LIMIT) {

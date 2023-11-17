@@ -1,3 +1,4 @@
+'use client'
 import { useState, useEffect, useMemo } from 'react'
 import type { CosmWasmClient } from '@cosmjs/cosmwasm-stargate'
 import { useChainContext } from './useChainContext'

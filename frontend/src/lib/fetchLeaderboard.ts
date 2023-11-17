@@ -1,4 +1,6 @@
-import type { CosmWasmClient } from '@cosmjs/cosmwasm-stargate'
+import { ENDPOINTS, LEADERBOAD_FETCH_LIMIT, MIGALOO_PAINT_CONTRACT_ADDRESS, ZERO } from '@/constants'
+import type { AxiosResponse } from 'axios'
+import { fetchSmartContract } from './fetchSmartContract'
 
 export interface FetchLeaderboardPayload {
   leaderboard: {
@@ -24,4 +26,9 @@ export const fetchLeaderboardPayload = (startAfter?: string, limit?: number): Fe
   }
 )
 
-export const fetchLeaderboard = async (client: CosmWasmClient, contract: string, payload: FetchLeaderboardPayload): Promise<FetchLeaderboardResponse> => await client.queryContractSmart(contract, payload) as FetchLeaderboardResponse
+export const fetchLeaderboard = async (startAfter?: string, limit: number = LEADERBOAD_FETCH_LIMIT): Promise<FetchLeaderboardResponse> => await fetchSmartContract(
+  ENDPOINTS.migaloo.rest[ZERO],
+  MIGALOO_PAINT_CONTRACT_ADDRESS,
+  fetchLeaderboardPayload(startAfter, limit)
+)
+  .then((response: AxiosResponse<{ data: FetchLeaderboardResponse }>) => response.data.data)

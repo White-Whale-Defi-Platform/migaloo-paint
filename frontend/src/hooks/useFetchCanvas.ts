@@ -1,8 +1,10 @@
+'use client'
+
 import { useState, useEffect, useMemo } from 'react'
-import { fetchCanvas, fetchCanvasPayload } from '@/lib'
+import { fetchCanvas } from '@/lib'
 import type { Canvas, Tile } from '@/state'
 import type { Async } from '@/types'
-import { CANVAS_FETCH_LIMIT, FETCH_INTERVAL, MIGALOO_PAINT_CONTRACT_ADDRESS } from '@/constants'
+import { CANVAS_FETCH_LIMIT, FETCH_INTERVAL } from '@/constants'
 import { useCosmWasmClient } from './useCosmWasmClient'
 
 export interface useFetchCanvasResult extends Async {
@@ -24,7 +26,7 @@ export const useFetchCanvas = (): useFetchCanvasResult => {
         let allTilesFetched = false
 
         while (!allTilesFetched) {
-          const response = await fetchCanvas(client, MIGALOO_PAINT_CONTRACT_ADDRESS, fetchCanvasPayload(startAfter, CANVAS_FETCH_LIMIT))
+          const response = await fetchCanvas(startAfter)
           allCanvasData = [...allCanvasData, ...response.canvas.map(({ painter, color, deposit }) => ({ painter, color, deposit: Number(deposit) }))]
 
           if (response.canvas.length < CANVAS_FETCH_LIMIT) {

@@ -19,9 +19,6 @@
   ],
   "ignoreUnresolved": [],
   "entry": [
-    "src/app/layout.tsx",
-    "src/app/page.tsx",
-    "src/app/canvas/page.tsx",
-    "src/app/leaderboard/page.tsx"
+    "src/app/**"
   ]
 }

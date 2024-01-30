@@ -5,10 +5,11 @@ use crate::types::{CanvasField, Config, LeaderboardEntry, Stats};
 
 #[cw_serde]
 pub struct InstantiateMsg {
-    pub furnace: Addr,
+    pub furnace: String,
     pub size: Uint128,
     pub color: String,
     pub coin: Coin,
+    pub burn_tokens_recipient: Option<String>,
 }
 
 #[cw_serde]
@@ -36,7 +37,9 @@ pub enum QueryMsg {
 }
 
 #[cw_serde]
-pub struct MigrateMsg {}
+pub struct MigrateMsg {
+    pub denom: String,
+}
 
 #[cw_serde]
 pub struct CanvasResponse {

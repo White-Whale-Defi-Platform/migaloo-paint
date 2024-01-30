@@ -4,5 +4,6 @@ pub mod execute;
 pub mod msg;
 pub mod query;
 pub mod state;
+pub mod tests;
 pub mod types;
 pub mod util;

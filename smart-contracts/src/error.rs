@@ -30,4 +30,7 @@ pub enum ContractError {
 
     #[error("Invalid Position")]
     InvalidPosition {},
+
+    #[error("Invalid Color")]
+    InvalidColor {},
 }

@@ -16,10 +16,6 @@ pub fn paint(
     position: Uint128,
     mut color: String,
 ) -> Result<Response, ContractError> {
-
-    // Validate painter
-    let painter = &deps.api.addr_validate(info.sender.as_str())?;
-
     // Validate color
     color = validate_color(&color)?;
 
@@ -34,14 +30,24 @@ pub fn paint(
     // Validate deposit
     let deposit = must_pay(&info, &config.coin.denom)?;
 
+    // load canvas
+    let canvas = CANVAS.load(deps.storage, position.u128());
+
     // Load old deposit
-    let old_deposit = match CANVAS.load(deps.storage, position.u128()) {
+    let old_deposit = match &canvas {
         Ok(field) => field.deposit,
-        Err(_) => config.coin.amount,
+        // If the canvas position hasn't been colored yet, set `old_deposit` to `config.coin.amount` - 1
+        // so new painter will pay at least the value set on instantiattion
+        Err(_) => config.coin.amount.checked_sub(Uint128::one())?,
     };
 
+    // Validate that new color is different from old color
+    if canvas.is_ok() && canvas.unwrap().color == color {
+        return Err(ContractError::InvalidColor {});
+    }
+
     // Validate deposit amount
-    if deposit.lt(&old_deposit) {
+    if deposit.le(&old_deposit) {
         return Err(ContractError::InvalidFundsAmount {});
     }
 
@@ -50,7 +56,7 @@ pub fn paint(
         deps.storage,
         position.u128(),
         &CanvasField {
-            painter: painter.clone(),
+            painter: info.sender.clone(),
             color,
             deposit,
         },
@@ -75,13 +81,13 @@ pub fn paint(
             deposits: entry.deposits.checked_add(deposit)?,
         },
         Err(_) => LeaderboardEntry {
-            painter: painter.clone(),
+            painter: info.sender.clone(),
             strokes: Uint128::new(1),
             deposits: deposit,
         },
     };
-    LEADERBOARD.save(deps.storage, painter.clone(), &entry)?;
-    
+    LEADERBOARD.save(deps.storage, info.sender, &entry)?;
+
     // Execute Burn
     let message = CosmosMsg::Wasm(WasmMsg::Execute {
         contract_addr: config.furnace.to_string(),

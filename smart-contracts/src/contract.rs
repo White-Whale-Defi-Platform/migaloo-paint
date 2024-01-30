@@ -1,6 +1,6 @@
 use cosmwasm_std::{
-    entry_point, to_json_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdError,
-    StdResult, Uint128,
+    entry_point, to_json_binary, BalanceResponse, BankMsg, BankQuery, Binary, Deps, DepsMut, Env,
+    MessageInfo, Response, StdError, StdResult, Uint128,
 };
 
 use crate::error::ContractError;
@@ -14,9 +14,15 @@ use crate::{execute, query};
 pub fn instantiate(
     deps: DepsMut,
     _env: Env,
-    _info: MessageInfo,
+    info: MessageInfo,
     msg: InstantiateMsg,
 ) -> Result<Response, ContractError> {
+    // Validate recipient address or set to sender
+    let burn_tokens_recipient = match msg.burn_tokens_recipient {
+        Some(burn_tokens_recipient) => deps.api.addr_validate(&burn_tokens_recipient)?,
+        None => info.sender,
+    };
+
     // Initialize CONFIG
     CONFIG.save(
         deps.storage,
@@ -24,7 +30,8 @@ pub fn instantiate(
             size: msg.size,
             color: validate_color(&msg.color)?,
             coin: msg.coin,
-            furnace: deps.api.addr_validate(msg.furnace.as_str())?,
+            furnace: deps.api.addr_validate(&msg.furnace)?,
+            burn_tokens_recipient,
         },
     )?;
 
@@ -69,6 +76,22 @@ pub fn query(deps: Deps, env: Env, msg: QueryMsg) -> StdResult<Binary> {
 }
 
 #[entry_point]
-pub fn migrate(_deps: DepsMut, _env: Env, _msg: MigrateMsg) -> Result<Response, StdError> {
-    Ok(Response::default())
+pub fn migrate(deps: DepsMut, env: Env, msg: MigrateMsg) -> Result<Response, StdError> {
+    // Get contract balance and send to recipient if not zero
+    let balance: BalanceResponse = deps.querier.query(
+        &BankQuery::Balance {
+            address: env.contract.address.to_string(),
+            denom: msg.denom,
+        }
+        .into(),
+    )?;
+    if balance.amount.amount.is_zero() {
+        return Err(StdError::generic_err("Contract balance is zero"));
+    }
+    let bank_msg = BankMsg::Send {
+        to_address: CONFIG.load(deps.storage)?.burn_tokens_recipient.to_string(),
+        amount: vec![balance.amount],
+    };
+    // TODO: add attributes to response
+    Ok(Response::new().add_message(bank_msg))
 }

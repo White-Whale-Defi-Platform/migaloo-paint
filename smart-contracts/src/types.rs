@@ -31,4 +31,5 @@ pub struct Config {
     pub color: String,
     pub coin: Coin,
     pub furnace: Addr,
+    pub burn_tokens_recipient: Addr,
 }

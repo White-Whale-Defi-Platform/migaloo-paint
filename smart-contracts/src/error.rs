@@ -33,4 +33,7 @@ pub enum ContractError {
 
     #[error("Invalid Color")]
     InvalidColor {},
+
+    #[error("Invalid Reply ID")]
+    InvalidReplyId {},
 }

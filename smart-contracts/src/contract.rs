@@ -1,6 +1,6 @@
 use cosmwasm_std::{
     entry_point, to_json_binary, BalanceResponse, BankMsg, BankQuery, Binary, Deps, DepsMut, Env,
-    MessageInfo, Response, StdError, StdResult, Uint128,
+    MessageInfo, Reply, Response, StdError, StdResult, Uint128,
 };
 
 use crate::error::ContractError;
@@ -8,7 +8,9 @@ use crate::msg::{ExecuteMsg, InstantiateMsg, MigrateMsg, QueryMsg};
 use crate::state::{CONFIG, STATS};
 use crate::types::{Config, Stats};
 use crate::util::validate_color;
-use crate::{execute, query};
+use crate::{execute, query, reply};
+
+const BURN_REPLY_ID: u64 = 1;
 
 #[entry_point]
 pub fn instantiate(
@@ -57,6 +59,19 @@ pub fn execute(
 ) -> Result<Response, ContractError> {
     match msg {
         ExecuteMsg::Paint { position, color } => execute::paint(deps, env, info, position, color),
+    }
+}
+
+#[entry_point]
+pub fn reply(
+    deps: DepsMut,
+    env: Env,
+    info: MessageInfo,
+    msg: Reply,
+) -> Result<Response, ContractError> {
+    match msg.id {
+        BURN_REPLY_ID => reply::handle_reply_burn(deps, env, info, msg),
+        _ => Err(ContractError::InvalidReplyId {}),
     }
 }
 

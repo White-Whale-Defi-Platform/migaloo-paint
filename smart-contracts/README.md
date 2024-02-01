@@ -36,7 +36,7 @@ Paint changes the color of a single tile on the canvas. Requires the user to sen
 | Key        | Type                    | Description                                                                 |
 | ---------- | ----------------------- | --------------------------------------------------------------------------- |
 | `position` | `cosmwasm_std::Uint128` | Tile position. Must be element of [0, config.size).                         |
-| `color`    | `string`                | New tile color. Hexadecimal color code with a leading **#** and six digits. |
+| `color`    | `String`                | New tile color. Hexadecimal color code with a leading **#** and six digits. |
 
 ```json
 {

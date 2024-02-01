@@ -125,7 +125,7 @@ pub fn migrate(deps: DepsMut, env: Env, msg: MigrateMsg) -> Result<Response, Std
 
     Ok(Response::new()
         .add_message(bank_msg)
-        .add_attribute("action", "migrate")
-        .add_attribute("ash_denom", &msg.ash_denom)
-        .add_attribute("burn_tokens_address", &msg.burn_tokens_recipient))
+        .add_attribute("action", "migrate".to_string())
+        .add_attribute("ash_denom", msg.ash_denom)
+        .add_attribute("burn_tokens_address", msg.burn_tokens_recipient))
 }

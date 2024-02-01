@@ -12,6 +12,7 @@ mod tests {
         const COLOR1: &str = "#9cd26d";
         const COLOR2: &str = "#9cd26e";
         const BURN_REPLY_ID: u64 = 1;
+        const PAINTER2: &str = "painter2";
 
         // Instantiate the contract. Set size to 10 and coin amount to 100 uwhale
         let mut deps = mock_dependencies();
@@ -83,5 +84,24 @@ mod tests {
         let info = mock_info("creator", &coins(101, "uwhale"));
         let res = execute(deps.as_mut(), env.clone(), info.clone(), msg).unwrap_err();
         assert_eq!(res, ContractError::InvalidPosition {});
+
+        // Paint on position 5 with 101 uwhale (bare minimum), same color, but different painter. Should burn 101 uwhale
+        let msg = ExecuteMsg::Paint {
+            position: Uint128::new(5),
+            color: COLOR2.to_string(),
+        };
+        let info = mock_info(PAINTER2, &coins(101, "uwhale"));
+        let res = execute(deps.as_mut(), env.clone(), info.clone(), msg).unwrap();
+        assert_eq!(
+            res.messages[0],
+            SubMsg::reply_on_success(
+                WasmMsg::Execute {
+                    contract_addr: "furnace".to_string(),
+                    msg: to_json_binary(&FurnaceExecuteMsg::Burn {}).unwrap(),
+                    funds: vec![coin(101, "uwhale")],
+                },
+                BURN_REPLY_ID
+            )
+        );
     }
 }

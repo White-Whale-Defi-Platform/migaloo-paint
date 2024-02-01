@@ -32,6 +32,6 @@ pub fn handle_burn_reply(deps: DepsMut, env: Env, _msg: Reply) -> Result<Respons
     // Return
     Ok(Response::default()
         .add_messages(bank_msgs)
-        .add_attribute("action", "reply_burn")
+        .add_attribute("action", "reply_burn".to_string())
         .add_attribute("to", config.burn_tokens_recipient.to_string()))
 }

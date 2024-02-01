@@ -97,6 +97,7 @@ pub fn paint(
         funds: info.funds,
     });
 
+    // Return response with reply on success submessage to be handled by reply entry point later
     Ok(Response::new()
         .add_submessage(SubMsg::reply_on_success(message, BURN_REPLY_ID))
         .add_attribute("action", "paint"))

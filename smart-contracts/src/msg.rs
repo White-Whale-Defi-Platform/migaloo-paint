@@ -38,7 +38,8 @@ pub enum QueryMsg {
 
 #[cw_serde]
 pub struct MigrateMsg {
-    pub denom: String,
+    pub burn_tokens_recipient: String,
+    pub ash_denom: String,
 }
 
 #[cw_serde]

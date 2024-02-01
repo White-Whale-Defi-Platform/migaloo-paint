@@ -11,6 +11,7 @@ mod tests {
         // Set colors to be used
         const COLOR1: &str = "#9cd26d";
         const COLOR2: &str = "#9cd26e";
+        const BURN_REPLY_ID: u64 = 1;
 
         // Instantiate the contract. Set size to 10 and coin amount to 100 uwhale
         let mut deps = mock_dependencies();
@@ -44,11 +45,14 @@ mod tests {
         let res = execute(deps.as_mut(), env.clone(), info.clone(), msg).unwrap();
         assert_eq!(
             res.messages[0],
-            SubMsg::new(WasmMsg::Execute {
-                contract_addr: "furnace".to_string(),
-                msg: to_json_binary(&FurnaceExecuteMsg::Burn {}).unwrap(),
-                funds: vec![coin(100, "uwhale")],
-            })
+            SubMsg::reply_on_success(
+                WasmMsg::Execute {
+                    contract_addr: "furnace".to_string(),
+                    msg: to_json_binary(&FurnaceExecuteMsg::Burn {}).unwrap(),
+                    funds: vec![coin(100, "uwhale")],
+                },
+                BURN_REPLY_ID
+            )
         );
 
         // Paint on position 5 (again) with 101 uwhale (should be at least 101) and same color should error due to color
